@@ -6,7 +6,6 @@ import '../screens/detalle_reporte/buscar_screen.dart';
 import '../screens/home/login_screen.dart';
 import '../screens/home/registro_screen.dart';
 import '../screens/detalle_reporte/admin_screen.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 class Routes {
   static const String login        = '/';
@@ -27,5 +26,6 @@ final Map<String, WidgetBuilder> appRoutes = {
 };
 
 class Config {
-  static String get baseUrl => dotenv.env['BASE_URL'] ?? '';
+  static const String baseUrl =
+  String.fromEnvironment('BASE_URL', defaultValue: '');
 }
