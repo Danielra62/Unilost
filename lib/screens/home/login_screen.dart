@@ -1,8 +1,9 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-
 import '../../app/routes.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -222,16 +223,20 @@ class _LoginScreenState extends State<LoginScreen> {
       if (response.statusCode == 200) {
 
         final data = jsonDecode(response.body);
-        final String role = data["role"];
+
+        final prefs = await SharedPreferences.getInstance();
+
+        await prefs.setInt("user_id", data["user_id"]);
+        await prefs.setString("username", data["username"]);
+        await prefs.setString("role", data["role"]);
 
         if (mounted) {
-          if (role == "admin") {
+          if (data["role"] == "admin") {
             Navigator.pushReplacementNamed(context, '/admin');
           } else {
             Navigator.pushReplacementNamed(context, '/home');
           }
         }
-
       } else {
         _mostrarMensaje("Correo o contraseña incorrectos");
       }

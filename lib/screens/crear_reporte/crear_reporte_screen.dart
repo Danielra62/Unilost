@@ -50,6 +50,7 @@ class _CrearReporteScreenState extends State<CrearReporteScreen> {
               // ── BOTÓN VOLVER ──────────────────────────────
               IconButton(
                 onPressed: () => Navigator.pop(context),
+
                 icon: const Icon(Icons.arrow_back, color: Colors.white),
               ),
 
@@ -197,34 +198,27 @@ class _CrearReporteScreenState extends State<CrearReporteScreen> {
         children: [
           Row(
             children: [
-              Icon(
-                _isFound ? Icons.check_circle : Icons.search,
-                color: _isFound ? Colors.greenAccent : Colors.orangeAccent,
+              const Icon(
+                Icons.search,
+                color: Colors.orangeAccent,
                 size: 22,
               ),
               const SizedBox(width: 10),
-              Text(
-                _isFound ? "Encontrado" : "Extraviado",
+              const Text(
+                "Extraviado",
                 style: TextStyle(
-                  color: _isFound ? Colors.greenAccent : Colors.orangeAccent,
+                  color: Colors.orangeAccent,
                   fontWeight: FontWeight.bold,
                   fontSize: 15,
                 ),
               ),
             ],
           ),
-          Switch(
-            value: _isFound,
-            onChanged: (val) => setState(() => _isFound = val),
-            activeColor: Colors.greenAccent,
-            inactiveThumbColor: Colors.orangeAccent,
-            inactiveTrackColor: Colors.orangeAccent.withOpacity(0.3),
-          ),
+          // Switch eliminado - ya no es necesario
         ],
       ),
     );
   }
-
   /// Selector de imagen con preview
   Widget _buildImagePicker(Color azulBoton) {
     return Column(
