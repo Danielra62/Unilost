@@ -4,8 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:image_picker/image_picker.dart';
 import 'package:flutter_image_compress/flutter_image_compress.dart';
-
 import '../../app/routes.dart';
+import '../../models/app_colors.dart';
 
 class CrearReporteScreen extends StatefulWidget {
   const CrearReporteScreen({super.key});
@@ -15,103 +15,151 @@ class CrearReporteScreen extends StatefulWidget {
 }
 
 class _CrearReporteScreenState extends State<CrearReporteScreen> {
-
   final TextEditingController _descripcionController = TextEditingController();
-  final TextEditingController _lugarController       = TextEditingController();
-  final TextEditingController _asignadoController    = TextEditingController();
+  final TextEditingController _lugarController = TextEditingController();
+  final TextEditingController _asignadoController = TextEditingController();
 
-  bool    _cargando  = false;
-  bool    _isFound   = false;   // false = extraviado, true = encontrado
-  File?   _imagenSeleccionada;
+  bool _cargando = false;
+  File? _imagenSeleccionada;
   String? _imagenBase64;
 
   final String baseUrl = Config.baseUrl;
-  final ImagePicker   _picker     = ImagePicker();
-
-  // =========================================================
-  // BUILD
-  // =========================================================
+  final ImagePicker _picker = ImagePicker();
 
   @override
   Widget build(BuildContext context) {
-
-    const Color azulMarino = Color(0xFF0D1B2A);
-    const Color azulBoton  = Color(0xFF1B263B);
-
     return Scaffold(
-      backgroundColor: azulMarino,
+      backgroundColor: AppColors.azulProfundo,
       body: SafeArea(
         child: SingleChildScrollView(
-          padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 20),
+          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-
-              // ── BOTÓN VOLVER ──────────────────────────────
-              IconButton(
-                onPressed: () => Navigator.pop(context),
-
-                icon: const Icon(Icons.arrow_back, color: Colors.white),
+              // ── CABECERA CON VOLVER ───────────────
+              Row(
+                children: [
+                  Container(
+                    decoration: BoxDecoration(
+                      color: AppColors.inputFondo,
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: IconButton(
+                      onPressed: () => Navigator.pop(context),
+                      icon: Icon(
+                        Icons.arrow_back,
+                        color: AppColors.textoClaro,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 16),
+                  Text(
+                    "Reportar objeto extraviado",
+                    style: TextStyle(
+                      color: AppColors.textoClaro,
+                      fontSize: 22,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ],
               ),
 
-              const SizedBox(height: 10),
+              const SizedBox(height: 24),
 
-              const Text(
-                "REGISTRAR OBJETO",
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 26,
-                  fontWeight: FontWeight.bold,
-                  letterSpacing: 1.5,
+              // ── BADGE DE ESTADO FIJO ─────────────────────
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                decoration: BoxDecoration(
+                  color: AppColors.rojoAlerta.withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(14),
+                  border: Border.all(
+                    color: AppColors.rojoAlerta.withOpacity(0.3),
+                  ),
+                ),
+                child: Row(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(8),
+                      decoration: BoxDecoration(
+                        color: AppColors.rojoAlerta,
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      child: const Icon(
+                        Icons.priority_high,
+                        color: Colors.white,
+                        size: 20,
+                      ),
+                    ),
+                    const SizedBox(width: 16),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const Text(
+                            "Reportando objeto EXTRAVIADO",
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontWeight: FontWeight.bold,
+                              fontSize: 16,
+                            ),
+                          ),
+                          const SizedBox(height: 4),
+                          Text(
+                            "Este reporte ayudará a que otros estudiantes encuentren tu objeto",
+                            style: TextStyle(
+                              color: AppColors.textoSecundarioClaro,
+                              fontSize: 13,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
                 ),
               ),
 
-              const SizedBox(height: 40),
+              const SizedBox(height: 30),
 
               // ── LUGAR ─────────────────────────────────────
-              _buildLabel("¿Dónde encontraste el objeto?"),
+              _buildLabel("¿Dónde se perdió?"),
               const SizedBox(height: 10),
               _buildInput(
                 controller: _lugarController,
                 hint: "Ej: Biblioteca, Aula 203, Cafetería...",
+                icon: Icons.location_on_outlined,
               ),
 
-              const SizedBox(height: 30),
+              const SizedBox(height: 24),
 
               // ── DESCRIPCIÓN ───────────────────────────────
-              _buildLabel("Explique su reporte"),
+              _buildLabel("Descripción del objeto"),
               const SizedBox(height: 10),
               _buildInput(
                 controller: _descripcionController,
-                hint: "Describa el objeto, color, marca...",
+                hint: "Color, marca, características distintivas...",
                 maxLines: 4,
+                icon: Icons.description_outlined,
               ),
 
-              const SizedBox(height: 30),
+              const SizedBox(height: 24),
 
-              // ── ASIGNADO ──────────────────────────────────
-              _buildLabel("¿A quién se lo asignaste?"),
+              // ── CONTACTO ──────────────────────────────────
+              _buildLabel("Nombre de contacto"),
               const SizedBox(height: 10),
               _buildInput(
                 controller: _asignadoController,
-                hint: "Nombre de la persona responsable...",
+                hint: "Tu nombre o cómo contactarte",
+                icon: Icons.person_outline,
               ),
 
               const SizedBox(height: 30),
 
-              // ── ESTADO DEL OBJETO ─────────────────────────
-              _buildLabel("Estado del objeto"),
-              const SizedBox(height: 12),
-              _buildStatusToggle(azulBoton),
-
-              const SizedBox(height: 30),
-
-              // ── IMAGEN (OPCIONAL) ─────────────────────────
+              // ── IMAGEN ─────────────────────────
               _buildLabel("Foto del objeto (opcional)"),
               const SizedBox(height: 12),
-              _buildImagePicker(azulBoton),
+              _buildImagePicker(),
 
-              const SizedBox(height: 50),
+              const SizedBox(height: 40),
 
               // ── BOTÓN REGISTRAR ───────────────────────────
               SizedBox(
@@ -119,26 +167,41 @@ class _CrearReporteScreenState extends State<CrearReporteScreen> {
                 height: 55,
                 child: ElevatedButton(
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: azulBoton,
+                    backgroundColor: AppColors.amarilloAccion,
+                    foregroundColor: AppColors.azulProfundo,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(14),
                     ),
-                    elevation: 6,
+                    elevation: 8,
                   ),
                   onPressed: _cargando ? null : _registrarObjeto,
                   child: _cargando
-                      ? const CircularProgressIndicator(color: Colors.white)
+                      ? CircularProgressIndicator(
+                    color: AppColors.azulProfundo,
+                    strokeWidth: 3,
+                  )
                       : const Text(
-                    "REGISTRAR OBJETO",
+                    "PUBLICAR REPORTE",
                     style: TextStyle(
                       fontWeight: FontWeight.bold,
-                      letterSpacing: 1.2,
+                      fontSize: 16,
+                      letterSpacing: 1.5,
                     ),
                   ),
                 ),
               ),
 
               const SizedBox(height: 20),
+
+              Center(
+                child: Text(
+                  "Tu reporte ayudará a otros estudiantes",
+                  style: TextStyle(
+                    color: AppColors.textoSecundarioClaro,
+                    fontSize: 12,
+                  ),
+                ),
+              ),
             ],
           ),
         ),
@@ -147,16 +210,17 @@ class _CrearReporteScreenState extends State<CrearReporteScreen> {
   }
 
   // =========================================================
-  // WIDGETS PERSONALIZADOS
+  // WIDGETS
   // =========================================================
 
   Widget _buildLabel(String text) {
     return Text(
       text,
-      style: const TextStyle(
-        color: Colors.white,
+      style: TextStyle(
+        color: AppColors.textoClaro,
         fontSize: 16,
-        fontWeight: FontWeight.bold,
+        fontWeight: FontWeight.w600,
+        letterSpacing: 0.5,
       ),
     );
   }
@@ -165,115 +229,171 @@ class _CrearReporteScreenState extends State<CrearReporteScreen> {
     required TextEditingController controller,
     required String hint,
     int maxLines = 1,
+    IconData? icon,
   }) {
-    return TextField(
-      controller: controller,
-      maxLines: maxLines,
-      style: const TextStyle(color: Colors.white),
-      decoration: InputDecoration(
-        hintText: hint,
-        hintStyle: const TextStyle(color: Colors.white54),
-        filled: true,
-        fillColor: const Color(0xFF1B263B),
-        contentPadding:
-        const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(14),
-          borderSide: BorderSide.none,
+    return Container(
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(14),
+        boxShadow: [
+          BoxShadow(
+            color: AppColors.azulProfundo.withOpacity(0.3),
+            blurRadius: 8,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: TextField(
+        controller: controller,
+        maxLines: maxLines,
+        style: const TextStyle(color: Colors.white),
+        decoration: InputDecoration(
+          hintText: hint,
+          hintStyle: TextStyle(
+            color: AppColors.textoSecundarioClaro.withOpacity(0.7),
+          ),
+          filled: true,
+          fillColor: AppColors.inputFondo,
+          contentPadding: const EdgeInsets.symmetric(
+            horizontal: 16,
+            vertical: 14,
+          ),
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(14),
+            borderSide: BorderSide.none,
+          ),
+          prefixIcon: icon != null
+              ? Icon(
+            icon,
+            color: AppColors.textoSecundarioClaro,
+            size: 20,
+          )
+              : null,
         ),
       ),
     );
   }
 
-  /// Toggle: EXTRAVIADO / ENCONTRADO
-  Widget _buildStatusToggle(Color azulBoton) {
-    return Container(
-      decoration: BoxDecoration(
-        color: azulBoton,
-        borderRadius: BorderRadius.circular(14),
-      ),
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Row(
-            children: [
-              const Icon(
-                Icons.search,
-                color: Colors.orangeAccent,
-                size: 22,
-              ),
-              const SizedBox(width: 10),
-              const Text(
-                "Extraviado",
-                style: TextStyle(
-                  color: Colors.orangeAccent,
-                  fontWeight: FontWeight.bold,
-                  fontSize: 15,
-                ),
-              ),
-            ],
-          ),
-          // Switch eliminado - ya no es necesario
-        ],
-      ),
-    );
-  }
-  /// Selector de imagen con preview
-  Widget _buildImagePicker(Color azulBoton) {
+  Widget _buildImagePicker() {
     return Column(
       children: [
-        // Preview o placeholder
         GestureDetector(
           onTap: _seleccionarImagen,
-          child: Container(
+          child: AnimatedContainer(
+            duration: const Duration(milliseconds: 300),
             width: double.infinity,
-            height: 160,
+            height: 180,
             decoration: BoxDecoration(
-              color: azulBoton,
-              borderRadius: BorderRadius.circular(14),
+              gradient: _imagenSeleccionada == null
+                  ? LinearGradient(
+                colors: [
+                  AppColors.inputFondo,
+                  AppColors.inputFondo.withOpacity(0.7),
+                ],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+              )
+                  : null,
+              color: _imagenSeleccionada != null ? null : AppColors.inputFondo,
+              borderRadius: BorderRadius.circular(16),
               border: Border.all(
-                color: Colors.white24,
-                width: 1.5,
+                color: _imagenSeleccionada == null
+                    ? AppColors.textoSecundarioClaro.withOpacity(0.3)
+                    : AppColors.amarilloAccion.withOpacity(0.5),
+                width: 2,
               ),
             ),
             child: _imagenSeleccionada != null
                 ? ClipRRect(
-              borderRadius: BorderRadius.circular(13),
-              child: Image.file(
-                _imagenSeleccionada!,
-                fit: BoxFit.cover,
+              borderRadius: BorderRadius.circular(14),
+              child: Stack(
+                fit: StackFit.expand,
+                children: [
+                  Image.file(
+                    _imagenSeleccionada!,
+                    fit: BoxFit.cover,
+                  ),
+                  Positioned(
+                    bottom: 8,
+                    right: 8,
+                    child: Container(
+                      padding: const EdgeInsets.all(8),
+                      decoration: BoxDecoration(
+                        color: AppColors.azulProfundo.withOpacity(0.8),
+                        borderRadius: BorderRadius.circular(30),
+                        border: Border.all(
+                          color: AppColors.amarilloAccion,
+                          width: 1,
+                        ),
+                      ),
+                      child: Icon(
+                        Icons.edit,
+                        color: AppColors.amarilloAccion,
+                        size: 16,
+                      ),
+                    ),
+                  ),
+                ],
               ),
             )
-                : const Column(
+                : Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Icon(Icons.add_a_photo_outlined,
-                    color: Colors.white38, size: 40),
-                SizedBox(height: 8),
+                Container(
+                  padding: const EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    color: AppColors.amarilloAccion.withOpacity(0.1),
+                    shape: BoxShape.circle,
+                  ),
+                  child: Icon(
+                    Icons.add_a_photo_outlined,
+                    color: AppColors.amarilloAccion,
+                    size: 40,
+                  ),
+                ),
+                const SizedBox(height: 12),
                 Text(
                   "Toca para agregar una foto",
-                  style: TextStyle(color: Colors.white38, fontSize: 13),
+                  style: TextStyle(
+                    color: AppColors.textoSecundarioClaro,
+                    fontSize: 14,
+                    fontWeight: FontWeight.w500,
+                  ),
                 ),
               ],
             ),
           ),
         ),
 
-        // Botón quitar imagen (solo si hay una seleccionada)
         if (_imagenSeleccionada != null) ...[
-          const SizedBox(height: 8),
-          TextButton.icon(
-            onPressed: () => setState(() {
-              _imagenSeleccionada = null;
-              _imagenBase64 = null;
-            }),
-            icon: const Icon(Icons.delete_outline,
-                color: Colors.redAccent, size: 18),
-            label: const Text(
-              "Quitar imagen",
-              style: TextStyle(color: Colors.redAccent, fontSize: 13),
-            ),
+          const SizedBox(height: 12),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: [
+              TextButton.icon(
+                onPressed: () => setState(() {
+                  _imagenSeleccionada = null;
+                  _imagenBase64 = null;
+                }),
+                icon: Icon(
+                  Icons.delete_outline,
+                  color: AppColors.rojoAlerta,
+                  size: 18,
+                ),
+                label: Text(
+                  "Quitar imagen",
+                  style: TextStyle(
+                    color: AppColors.rojoAlerta,
+                    fontSize: 13,
+                  ),
+                ),
+                style: TextButton.styleFrom(
+                  backgroundColor: AppColors.rojoAlerta.withOpacity(0.1),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                ),
+              ),
+            ],
           ),
         ],
       ],
@@ -285,55 +405,65 @@ class _CrearReporteScreenState extends State<CrearReporteScreen> {
   // =========================================================
 
   Future<void> _seleccionarImagen() async {
-    final XFile? picked = await _picker.pickImage(
-      source: ImageSource.gallery,
-      imageQuality: 80,   // pre-compresión antes de enviar
-    );
+    try {
+      final XFile? picked = await _picker.pickImage(
+        source: ImageSource.gallery,
+        imageQuality: 80,
+      );
 
-    if (picked == null) return;
+      if (picked == null) return;
 
-    // Comprimir aún más con flutter_image_compress
-    final List<int>? compressed = await FlutterImageCompress.compressWithFile(
-      picked.path,
-      minWidth: 800,
-      minHeight: 800,
-      quality: 70,
-      format: CompressFormat.jpeg,
-    );
+      setState(() => _cargando = true);
 
-    if (compressed == null) return;
+      final List<int>? compressed = await FlutterImageCompress.compressWithFile(
+        picked.path,
+        minWidth: 800,
+        minHeight: 800,
+        quality: 70,
+        format: CompressFormat.jpeg,
+      );
 
-    setState(() {
-      _imagenSeleccionada = File(picked.path);
-      _imagenBase64 = base64Encode(compressed);
-    });
+      if (compressed == null) {
+        _mostrarMensaje("Error al comprimir la imagen");
+        setState(() => _cargando = false);
+        return;
+      }
+
+      setState(() {
+        _imagenSeleccionada = File(picked.path);
+        _imagenBase64 = base64Encode(compressed);
+        _cargando = false;
+      });
+
+      _mostrarMensaje("✅ Imagen agregada correctamente");
+    } catch (e) {
+      setState(() => _cargando = false);
+      _mostrarMensaje("Error al seleccionar la imagen");
+    }
   }
 
   // =========================================================
-  // API FASTAPI
+  // API
   // =========================================================
 
   Future<void> _registrarObjeto() async {
-
     final descripcion = _descripcionController.text.trim();
-    final lugar       = _lugarController.text.trim();
-    final asignado    = _asignadoController.text.trim();
+    final lugar = _lugarController.text.trim();
+    final asignado = _asignadoController.text.trim();
 
     if (descripcion.isEmpty || lugar.isEmpty || asignado.isEmpty) {
-      _mostrarMensaje("Todos los campos son obligatorios");
+      _mostrarMensaje("Completa todos los campos obligatorios");
       return;
     }
 
     setState(() => _cargando = true);
 
     try {
-
-      // Construir body — imagen solo si fue seleccionada
       final Map<String, dynamic> body = {
         "description": descripcion,
-        "location":    lugar,
+        "location": lugar,
         "assigned_to": asignado,
-        "is_found":    _isFound,
+        "is_found": false, // 👈 SIEMPRE FALSE (extraviado)
         if (_imagenBase64 != null) "image_base64": _imagenBase64,
       };
 
@@ -344,14 +474,14 @@ class _CrearReporteScreenState extends State<CrearReporteScreen> {
       );
 
       if (response.statusCode == 200 || response.statusCode == 201) {
-        _mostrarMensaje("Objeto registrado correctamente");
-        if (mounted) Navigator.pop(context);
+        _mostrarMensaje("✅ ¡Reporte creado correctamente!");
+        await Future.delayed(const Duration(seconds: 1));
+        if (mounted) Navigator.pop(context, true);
       } else {
-        _mostrarMensaje("Error al registrar objeto");
+        _mostrarMensaje("Error al crear reporte");
       }
-
     } catch (e) {
-      _mostrarMensaje("Error de conexión con el servidor");
+      _mostrarMensaje("Error de conexión");
     }
 
     if (mounted) setState(() => _cargando = false);
@@ -360,10 +490,21 @@ class _CrearReporteScreenState extends State<CrearReporteScreen> {
   void _mostrarMensaje(String mensaje) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        backgroundColor: Colors.white,
+        backgroundColor: mensaje.contains("✅")
+            ? AppColors.verdeExito
+            : AppColors.amarilloAccion,
         content: Text(
           mensaje,
-          style: const TextStyle(color: Colors.black),
+          style: TextStyle(
+            color: mensaje.contains("✅")
+                ? Colors.white
+                : AppColors.azulProfundo,
+            fontWeight: FontWeight.w500,
+          ),
+        ),
+        behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(10),
         ),
       ),
     );
