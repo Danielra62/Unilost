@@ -4,7 +4,6 @@ import 'package:http/http.dart' as http;
 
 import '../app/routes.dart';
 import '../models/reporte.dart';
-import '../models/facultad.dart';
 
 class ReporteProvider extends ChangeNotifier {
   final String baseUrl = Config.baseUrl;
@@ -13,12 +12,7 @@ class ReporteProvider extends ChangeNotifier {
 
   List<Reporte> get todosLosReportes => _reportes;
 
-  List<Reporte> obtenerReportesPorFacultad(Facultad facultad) {
-    return _reportes.where((r) {
-      return r.facultad == Facultad.universidad ||
-          r.facultad == facultad;
-    }).toList();
-  }
+
 
   Future<void> cargarReportesDesdeApi() async {
     final response = await http.get(Uri.parse('$baseUrl/reportes'));
