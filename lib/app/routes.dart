@@ -6,6 +6,7 @@ import '../screens/detalle_reporte/buscar_screen.dart';
 import '../screens/home/login_screen.dart';
 import '../screens/home/registro_screen.dart';
 import '../screens/detalle_reporte/admin_screen.dart';
+import '../screens/home/OlvidePasswordScreen.dart';
 
 class Routes {
   static const String login        = '/';
@@ -14,6 +15,8 @@ class Routes {
   static const String crearReporte = '/crear-reporte';
   static const String buscar       = '/buscar';
   static const String admin        = '/admin';
+  static const String olvidePassword  = '/OlvidePasswordScreen';
+
 }
 
 final Map<String, WidgetBuilder> appRoutes = {
@@ -23,6 +26,8 @@ final Map<String, WidgetBuilder> appRoutes = {
   Routes.crearReporte: (context) => const CrearReporteScreen(),
   Routes.buscar:       (context) => const BuscarScreen(),
   Routes.admin:        (context) => const AdminScreen(),
+  Routes.olvidePassword: (context) => const OlvidePasswordScreen(),
+
 };
 
 class Config {

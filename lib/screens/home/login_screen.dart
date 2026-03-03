@@ -116,9 +116,7 @@ class _LoginScreenState extends State<LoginScreen> {
               Align(
                 alignment: Alignment.centerRight,
                 child: TextButton(
-                  onPressed: () {
-                    // TODO: Implementar recuperación de contraseña
-                  },
+                  onPressed: () => Navigator.pushNamed(context, Routes.olvidePassword),
                   style: TextButton.styleFrom(
                     foregroundColor: AppColors.textoSecundarioClaro,
                   ),

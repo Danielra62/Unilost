@@ -13,7 +13,7 @@ class AppColors {
   static const Color textoSecundarioClaro = Color(0xFFB8C7DE);
   static const Color verdeExito = Color(0xFF2E7D32);
   static const Color rojoError = Color(0xFFC62828);
-  static const Color naranjaVisibilidad = Color(0xFFF57C00);  // Naranja brillante
-  static const Color rojoAlerta = Color(0xFFC62828);  // Rojo profundo
-  static const Color rojoFavorito = Color(0xFFE91E63);  // Rosa/rojo moderno
+  static const Color naranjaVisibilidad = Color(0xFFF57C00);
+  static const Color rojoAlerta = Color(0xFFC62828);
+  static const Color rojoFavorito = Color(0xFFE91E63);
 }
