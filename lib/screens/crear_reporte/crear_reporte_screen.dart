@@ -405,42 +405,76 @@ class _CrearReporteScreenState extends State<CrearReporteScreen> {
   // =========================================================
 
   Future<void> _seleccionarImagen() async {
-    try {
-      final XFile? picked = await _picker.pickImage(
-        source: ImageSource.gallery,
-        imageQuality: 80,
+  showModalBottomSheet(
+    context: context,
+    backgroundColor: AppColors.inputFondo,
+    shape: const RoundedRectangleBorder(
+      borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+    ),
+    builder: (_) {
+      return SafeArea(
+        child: Wrap(
+          children: [
+            ListTile(
+              leading: Icon(Icons.camera_alt, color: AppColors.amarilloAccion),
+              title: const Text("Tomar foto"),
+              onTap: () {
+                Navigator.pop(context);
+                _pickImage(ImageSource.camera);
+              },
+            ),
+            ListTile(
+              leading: Icon(Icons.photo_library, color: AppColors.amarilloAccion),
+              title: const Text("Elegir de galería"),
+              onTap: () {
+                Navigator.pop(context);
+                _pickImage(ImageSource.gallery);
+              },
+            ),
+          ],
+        ),
       );
+    },
+  );
+}
 
-      if (picked == null) return;
+    Future<void> _pickImage(ImageSource source) async {
+  try {
+    final XFile? picked = await _picker.pickImage(
+      source: source,
+      imageQuality: 80,
+    );
 
-      setState(() => _cargando = true);
+    if (picked == null) return;
 
-      final List<int>? compressed = await FlutterImageCompress.compressWithFile(
-        picked.path,
-        minWidth: 800,
-        minHeight: 800,
-        quality: 70,
-        format: CompressFormat.jpeg,
-      );
+    setState(() => _cargando = true);
 
-      if (compressed == null) {
-        _mostrarMensaje("Error al comprimir la imagen");
-        setState(() => _cargando = false);
-        return;
-      }
+    final List<int>? compressed = await FlutterImageCompress.compressWithFile(
+      picked.path,
+      minWidth: 800,
+      minHeight: 800,
+      quality: 70,
+      format: CompressFormat.jpeg,
+    );
 
-      setState(() {
-        _imagenSeleccionada = File(picked.path);
-        _imagenBase64 = base64Encode(compressed);
-        _cargando = false;
-      });
-
-      _mostrarMensaje("✅ Imagen agregada correctamente");
-    } catch (e) {
+    if (compressed == null) {
+      _mostrarMensaje("Error al comprimir la imagen");
       setState(() => _cargando = false);
-      _mostrarMensaje("Error al seleccionar la imagen");
+      return;
     }
+
+    setState(() {
+      _imagenSeleccionada = File(picked.path);
+      _imagenBase64 = base64Encode(compressed);
+      _cargando = false;
+    });
+
+    _mostrarMensaje("✅ Imagen agregada correctamente");
+  } catch (e) {
+    setState(() => _cargando = false);
+    _mostrarMensaje("Error al seleccionar la imagen");
   }
+}
 
   // =========================================================
   // API
